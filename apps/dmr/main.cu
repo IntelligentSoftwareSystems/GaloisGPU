@@ -737,7 +737,7 @@ int main(int argc, char *argv[]) {
 	unsigned *bcount, *nbad, hnbad;
 	KernelConfig kconf;
 
-	clock_t starttime, endtime;
+	double starttime, endtime;
 	int runtime;
 
 	std::string str;
@@ -792,7 +792,7 @@ int main(int argc, char *argv[]) {
 	//unsigned ntriit = FACTOR;
 	//unsigned ntriperit = NBLOCKS * BLOCKSIZE;
 
-	starttime = clock();
+	starttime = rtclock();
 	for (unsigned ii = 0; ii < ntriit; ++ii) {
 		printf("finding neighbors: %3d%% complete.\r", (int)(ii*ntriperit*100.0 / ntriangles));
 		//printf("finding neighbors: iteration=%d, start=%d, end=%d.\n", ii, ii * ntriperit, (ii + 1) * ntriperit);
@@ -800,9 +800,9 @@ int main(int argc, char *argv[]) {
 		dfindneighbors<<<kconf.getNumberOfSMs(), kconf.getNumberOfBlockThreads()>>> (nodex, nodey, tnodes, neighbors, neighboredges, nnodes, ntriangles, kconf.getNumberOfSMs(), ii * ntriperit, (ii + 1) * ntriperit);
 		CudaTest("find neighbors failed");
 	}
-	endtime = clock();
+	endtime = rtclock();
 	printf("\n");
-	printf("findneighbors took %u ms.\n", (int)(1000.0f * (endtime - starttime) / CLOCKS_PER_SEC));
+	printf("findneighbors took %u ms.\n", (int)(1000.0f * (endtime - starttime)));
 
 	if (cudaMalloc((void **)&isbad, ALLOCFACTOR * ntriangles * sizeof(bool)) != cudaSuccess) CudaTest("allocating isbad failed");
 	if (cudaMalloc((void **)&obtuse, ALLOCFACTOR * ntriangles * sizeof(DIMSTYPE)) != cudaSuccess) CudaTest("allocating obtuse failed");
@@ -848,7 +848,7 @@ int main(int argc, char *argv[]) {
 	curralloc = ALLOCFACTOR * ntriangles;
 	
 	printf("solving.\n");
-	starttime = clock();
+	starttime = rtclock();
 
 	do {
 		++iteration;
@@ -903,7 +903,7 @@ int main(int argc, char *argv[]) {
 			blocksize = kconf.getNumberOfBlockThreads();
 		}
 	} while (hchanged);
-	endtime = clock();
+	endtime = rtclock();
 
 	printf("verifying...\n");
 	hnchanged = 0;
@@ -921,7 +921,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	printf("iterations = %d.\n", iteration);
-	runtime = (int) (1000.0f * (endtime - starttime) / CLOCKS_PER_SEC);
+	runtime = (int) (1000.0f * (endtime - starttime));
 	printf("%d ms.\n", runtime);
 	
 

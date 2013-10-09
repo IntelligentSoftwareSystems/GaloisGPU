@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
 	float fdummy;
 	KernelConfig kconf;
 
-	clock_t starttime, endtime;
+	float starttime, endtime;
 	int runtime;
 
 
@@ -371,7 +371,7 @@ int main(int argc, char *argv[])
 	unsigned outeriteration = 0;
 
 	printf("solving.\n");
-	starttime = clock();
+	starttime = rtclock();
 
 	do {
 		do {
@@ -409,8 +409,8 @@ int main(int argc, char *argv[])
 		}
 		++outeriteration;
 	} while (hchanged > 0 && outeriteration < MAXITERATION);
-	endtime = clock();
-	runtime = (int) (1000.0f * (endtime - starttime) / CLOCKS_PER_SEC);
+	endtime = rtclock();
+	runtime = (int) (1000.0f * (endtime - starttime));
 	printf("%d ms.\n", runtime);
 	
 	// cleanup left to the OS.
