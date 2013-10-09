@@ -11,21 +11,13 @@ LINKS :=
 
 EXTRA := $(FLAGS) $(INCLUDES) $(LINKS)
 
-.PHONY: all $(APPS) inputs
+.PHONY: clean
 
-all: $(APPS)
+ifdef APP
+$(APP): $(SRC)
+	$(NVCC) $(EXTRA) -o $(APP) $<
+	cp $(APP) $(BIN)
 
-$(APPS):
-	$(NVCC) $(EXTRA) -o $(BIN)/$(notdir $(subst /.,,$@)) $@/main.cu
-#$(MAKE) -C $@ all
-
-inputs:
-	@echo "Downloading inputs, this may take a minute..."
-	@wget http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu-inputs.tar.gz -O $(TOPLEVEL)/inputs.tar.gz 2>/dev/null
-	@echo "Uncompressing inputs, this may take another minute..."
-	@tar xvzf $(TOPLEVEL)/inputs.tar.gz
-	@rm $(TOPLEVEL)/inputs.tar.gz
-	@echo "Inputs available at $(TOPLEVEL)/inputs/"
-
-clean:
-	rm $(BIN)/*
+clean: 
+	rm -f $(APP) $(BIN)/$(APP)
+endif

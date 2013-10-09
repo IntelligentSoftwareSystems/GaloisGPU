@@ -1,4 +1,5 @@
 TOPLEVEL := ../..
-APPS := $(TOPLEVEL)/apps/$(notdir $(shell pwd))/.
+APP=dmr
+SRC=main.cu
 
 include ../common.mk
