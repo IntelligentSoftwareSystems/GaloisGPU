@@ -6,7 +6,7 @@ APPS := bfs bh dmr mst pta sp sssp
 all: $(APPS)
 
 $(APPS):
-	make -C apps/$@ 
+	make -C apps/$@
 
 include apps/common.mk
 
