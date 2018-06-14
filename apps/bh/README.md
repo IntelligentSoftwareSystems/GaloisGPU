@@ -5,9 +5,7 @@ The positions and velocities of the n galaxies are initialized according to the 
 The program calculates the motion of each galaxy through space for a number of time steps. 
 The data parallelism in this algorithm arises primarily from the independent force calculations.
 
-
-
-## COMPILE
+## BUILD
 
 Run make in the root directory or in the source folder (e.g. apps/bh)
 
