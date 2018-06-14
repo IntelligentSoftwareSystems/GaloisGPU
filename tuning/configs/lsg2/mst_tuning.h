@@ -1,0 +1,3 @@
+#pragma once
+#define FINDCOMPMINTWO_BLKSIZE 384
+static const char *MST_TUNING_PARAMETERS = "FINDCOMPMINTWO_BLKSIZE 384\n";

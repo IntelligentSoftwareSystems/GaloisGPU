@@ -34,6 +34,7 @@
 #include <thrust/remove.h>
 #include <thrust/transform_reduce.h>
 #include <thrust/iterator/counting_iterator.h>
+#include "cuda_launch_config.hpp"
 
 using namespace thrust;
 
@@ -113,6 +114,7 @@ __device__ uint __worklistIndex0__ = 0;
 __device__ uint __worklistIndex1__ = 1;
 
 uint createTime = 0;
+double createTime2 = 0;
 
 //////////// utility functions for the GPU /////////
 
@@ -2231,6 +2233,7 @@ __global__ void updateInfo() {
   }
 }
 
+__launch_bounds__ (DEF_THREADS_PER_BLOCK)
 __global__ void initialize() {
   uint to = __numVars__;
   uint headerSize = to * ELEMENT_WIDTH;
@@ -2390,7 +2393,7 @@ __host__ void printVector(const Vector& v, uint size) {
 }
 
 __host__ void initializeEdges(uint* &constraintsName, uint &constraintNumber, uint rel) {
-  dim3 dimInitialize(WARP_SIZE, getThreadsPerBlock(UPDATE_THREADS_PER_BLOCK) / WARP_SIZE);
+  dim3 dimInitialize(WARP_SIZE, getThreadsPerBlock(DEF_THREADS_PER_BLOCK) / WARP_SIZE);
   uint* constraints;
   uint numConstraints;
   cudaSafeCall(cudaMemcpyFromSymbol(&constraints, constraintsName, sizeof(uint*)));
@@ -2413,7 +2416,10 @@ extern "C" void createGraph(const uint numObjectVars, const uint maxOffset) {
   setbuf(stdout, NULL);
   printf("[dev]  Creating graph and masks out of constraints...");
   const uint startTime = clock();
+  double startTime2 = rtclock();
   dim3 dim(WARP_SIZE, getThreadsPerBlock(DEF_THREADS_PER_BLOCK)/ WARP_SIZE);
+
+  /* no need for maximum_residency here, since kernel will fail to launch otherwise */
 
   initialize<<<getBlocks(), dim>>>();
   checkKernelErrors("ERROR at initialize");
@@ -2432,6 +2438,7 @@ extern "C" void createGraph(const uint numObjectVars, const uint maxOffset) {
   
   printf("OK.\n");
   createTime = getEllapsedTime(startTime);
+  createTime2 = rtclock() - startTime2;
 }
 
 struct neqAdapter : public thrust::unary_function<tuple<uint, uint>, uint>{
@@ -2473,6 +2480,8 @@ extern "C" uint andersen(uint numVars) {
   setbuf(stdout, NULL);
   printf("[dev]  Solving: ");
   const uint startTime = clock();
+  const double startTime2 = rtclock();
+
   uint iteration = 0;
   uint updatePtsTime = 0;
   uint hcdTime = 0;
@@ -2481,6 +2490,7 @@ extern "C" uint andersen(uint numVars) {
   uint storeInvTime = 0;
   uint gepInvTime = 0;
   dim3 dim512(WARP_SIZE, getThreadsPerBlock(512) / WARP_SIZE);
+  dim3 dimDefThreads(WARP_SIZE, getThreadsPerBlock(DEF_THREADS_PER_BLOCK) / WARP_SIZE);
   dim3 dimUpdate2(WARP_SIZE, getThreadsPerBlock(UPDATE_THREADS_PER_BLOCK) / WARP_SIZE);
   dim3 dimHcd(WARP_SIZE, getThreadsPerBlock(HCD_THREADS_PER_BLOCK) / WARP_SIZE);
   dim3 dimCopy(WARP_SIZE, getThreadsPerBlock(COPY_INV_THREADS_PER_BLOCK) / WARP_SIZE);
@@ -2523,6 +2533,9 @@ extern "C" uint andersen(uint numVars) {
    *  d) devise a better representation scheme st all the benchmarks fit in 3GB, so I can effectively
    *  use an MSI GTX580 (=> much faster than the Tesla C2070 or Quadro 6000) for all the inputs.
    */  
+
+
+  const int updateInfo_residency = maximum_residency(updateInfo, dim512.x * dim512.y * dim512.z, 0);
   
   uint ptsStartIndex;  
   while (1) {
@@ -2553,18 +2566,18 @@ extern "C" uint andersen(uint numVars) {
     printRule("    hcd...");
     hcd<<<hcdBlocks, dimHcd>>>();
     checkKernelErrors("ERROR at hcd rule");                    
-    updateInfo<<<3 * blocks, dim512>>>();
+    updateInfo<<<updateInfo_residency * blocks, dim512>>>();
     checkKernelErrors("ERROR while updating information after collapsing");
     printRule("done\n");
     addTimeToRule(hcdTime, ruleTime);
 
     printRule("    finding curr_pts equivalences...");
-    computeCurrPtsHash<<<3 * blocks, dim512>>>();
+    computeCurrPtsHash<<<3 * blocks, dimDefThreads>>>();
     checkKernelErrors("ERROR at compute hash");
     uint numKeys;
     cudaSafeCall(cudaMemcpyFromSymbol(&numKeys, __numKeys__, uintSize));
     buildHashMap(key, val, numKeys);
-    findCurrPtsEquivalents<<<3 * blocks, dim512>>>();
+    findCurrPtsEquivalents<<<3 * blocks, dimUpdate2>>>();
     checkKernelErrors("ERROR in finding CURR_PTS equivalents");       
     printRule("done\n");
     addTimeToRule(ptsEquivTime, ruleTime);
@@ -2603,7 +2616,10 @@ extern "C" uint andersen(uint numVars) {
   uint ptsEndIndex;  
   cudaSafeCall(cudaMemcpyFromSymbol(&ptsEndIndex, __ptsFreeList__, uintSize));
   uint solveTime = getEllapsedTime(startTime);
+  double solveTime2 = rtclock() - startTime2;
+
   printf("SOLVE runtime: %u ms.\n", createTime + solveTime);
+  printf("SOLVE runtime2: %f ms.\n", (createTime2 + solveTime2) * 1000.0);
   printf("    create graph    : %u ms.\n", createTime);
   printf("    rule solving    : %u ms.\n", solveTime);
   printf("        updatePts   : %u ms.\n", updatePtsTime);
@@ -2613,6 +2629,6 @@ extern "C" uint andersen(uint numVars) {
   printf("        store       : %u ms.\n", storeInvTime);
   printf("        gepInv      : %u ms.\n", gepInvTime);
   //printf("amount of points-to info = %d.\n", ptsEndIndex - ptsStartIndex);
-  return ptsEndIndex - ptsStartIndex;
-  //return ptsEndIndex;
+  //  return ptsEndIndex - ptsStartIndex;
+  return ptsEndIndex;
 }

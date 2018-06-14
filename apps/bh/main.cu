@@ -40,44 +40,9 @@ Author: Martin Burtscher <burtscher@txstate.edu>
 #include <math.h>
 #include <sys/time.h>
 #include <cuda.h>
-
-#ifdef __KEPLER__
-
-// thread count
-#define THREADS1 1024  /* must be a power of 2 */
-#define THREADS2 1024
-#define THREADS3 768
-#define THREADS4 128
-#define THREADS5 1024
-#define THREADS6 1024
-
-// block count = factor * #SMs
-#define FACTOR1 2
-#define FACTOR2 2
-#define FACTOR3 1  /* must all be resident at the same time */
-#define FACTOR4 4  /* must all be resident at the same time */
-#define FACTOR5 2
-#define FACTOR6 2
-
-#else
-
-// thread count
-#define THREADS1 512  /* must be a power of 2 */
-#define THREADS2 512
-#define THREADS3 128
-#define THREADS4 64
-#define THREADS5 256
-#define THREADS6 1024
-
-// block count = factor * #SMs
-#define FACTOR1 3
-#define FACTOR2 3
-#define FACTOR3 6  /* must all be resident at the same time */
-#define FACTOR4 6  /* must all be resident at the same time */
-#define FACTOR5 5
-#define FACTOR6 1
-
-#endif
+#include <assert.h>
+#include "cuda_launch_config.hpp"
+#include "bh_tuning.h"
 
 #define WARPSIZE 32
 #define MAXDEPTH 32
@@ -969,12 +934,14 @@ int main(int argc, char *argv[])
     CudaTest("kernel 0 launch failed");
 
     for (step = 0; step < timesteps; step++) {
+      //fprintf(stderr, "BBKernel\n");
       cudaEventRecord(start, 0);
       BoundingBoxKernel<<<blocks * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, massl, posxl, posyl, poszl, maxxl, maxyl, maxzl, minxl, minyl, minzl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[1] += time;
       CudaTest("kernel 1 launch failed");
 
+      //fprintf(stderr, "TBKernel\n");
       cudaEventRecord(start, 0);
       ClearKernel1<<<blocks * 1, 1024>>>(nnodes, nbodies, childl);
       TreeBuildingKernel<<<blocks * FACTOR2, THREADS2>>>(nnodes, nbodies, errl, childl, posxl, posyl, poszl);
@@ -983,24 +950,29 @@ int main(int argc, char *argv[])
       timing[2] += time;
       CudaTest("kernel 2 launch failed");
 
+      //fprintf(stderr, "SKKernel\n");
       cudaEventRecord(start, 0);
+      assert(all_resident(SummarizationKernel, dim3(blocks * FACTOR3), dim3(THREADS3), 0));
       SummarizationKernel<<<blocks * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, massl, posxl, posyl, poszl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[3] += time;
       CudaTest("kernel 3 launch failed");
 
       cudaEventRecord(start, 0);
+      assert(all_resident(SortKernel, dim3(blocks * FACTOR4), dim3(THREADS4), 0));
       SortKernel<<<blocks * FACTOR4, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[4] += time;
       CudaTest("kernel 4 launch failed");
 
+      //fprintf(stderr, "FCKernel\n");
       cudaEventRecord(start, 0);
       ForceCalculationKernel<<<blocks * FACTOR5, THREADS5>>>(nnodes, nbodies, errl, dthf, itolsq, epssq, sortl, childl, massl, posxl, posyl, poszl, velxl, velyl, velzl, accxl, accyl, acczl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[5] += time;
       CudaTest("kernel 5 launch failed");
 
+      //fprintf(stderr, "IKKernel\n");
       cudaEventRecord(start, 0);
       IntegrationKernel<<<blocks * FACTOR6, THREADS6>>>(nbodies, dtime, dthf, posxl, posyl, poszl, velxl, velyl, velzl, accxl, accyl, acczl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);

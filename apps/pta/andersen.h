@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-
+#include <sys/time.h>
 
 // production or debug mode
 // in debug mode, only one warp is active in the whole grid.
@@ -129,12 +129,7 @@ typedef unsigned long int ulongint;
 //#define STORE_INV_THREADS_PER_BLOCK (864)
 //#define GEP_INV_THREADS_PER_BLOCK (1024)
 
-#define DEF_THREADS_PER_BLOCK (1024)
-#define UPDATE_THREADS_PER_BLOCK (1024)
-#define HCD_THREADS_PER_BLOCK (512)
-#define COPY_INV_THREADS_PER_BLOCK (512)
-#define STORE_INV_THREADS_PER_BLOCK (512)
-#define GEP_INV_THREADS_PER_BLOCK (512)
+#include "pta_tuning.h"
 
 #define UNLOCKED (UINT_MAX)
 #define LOCKED (UINT_MAX - 1)
@@ -260,4 +255,15 @@ __device__ __host__ static inline uint roundToPrevMultipleOf(uint num, uint powe
 __device__ __host__ static inline int isMultipleOf(uint num, uint powerOfTwo) {
   return !(num & (powerOfTwo - 1));
 }
+
+static double rtclock()
+{
+    struct timezone Tzp;
+    struct timeval Tp;
+    int stat;
+    stat = gettimeofday (&Tp, &Tzp);
+    if (stat != 0) printf("Error return from gettimeofday: %d",stat);
+    return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
+}
+
 #endif

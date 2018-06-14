@@ -53,10 +53,15 @@
 #  endif
 #endif
 
+#ifndef LSGDEBUG
+#define LSGDEBUG 0
+#endif 
+
 #define dprintf	if (debug) printf
-unsigned const debug = 0;
+unsigned const debug = LSGDEBUG;
 
 typedef unsigned foru;
+//typedef float foru;
 
 double rtclock()
 {
@@ -66,38 +71,6 @@ double rtclock()
     stat = gettimeofday (&Tp, &Tzp);
     if (stat != 0) printf("Error return from gettimeofday: %d",stat);
     return(Tp.tv_sec + Tp.tv_usec*1.0e-6);
-}
-
-
-__device__ 
-void global_sync(unsigned goalVal, volatile unsigned *Arrayin, volatile unsigned *Arrayout) {
-	// thread ID in a block
-	unsigned tid_in_blk = threadIdx.x * blockDim.y + threadIdx.y;
-	unsigned nBlockNum = gridDim.x * gridDim.y;
-	unsigned bid = blockIdx.x * gridDim.y + blockIdx.y;
-	// only thread 0 is used for synchronization
-	if (tid_in_blk == 0) {
-		Arrayin[bid] = goalVal;
-		__threadfence();
-	}
-	if (bid == 0) {
-		if (tid_in_blk < nBlockNum) {
-			while (Arrayin[tid_in_blk] != goalVal){
-				//Do nothing here
-			}
-		}
-		__syncthreads();
-		if (tid_in_blk < nBlockNum) {
-			Arrayout[tid_in_blk] = goalVal;
-			__threadfence();
-		}
-	}
-	if (tid_in_blk == 0) {
-		while (Arrayout[bid] != goalVal) {
-			//Do nothing here
-		}
-	}
-	__syncthreads();
 }
 
 static unsigned CudaTest(char *msg)
@@ -130,7 +103,7 @@ inline int ConvertSMVer2Cores(int major, int minor)
           { 0x20, 32 }, // Fermi Generation (SM 2.0) GF100 class
           { 0x21, 48 }, // Fermi Generation (SM 2.1) GF10x class
           { 0x30, 192}, // Fermi Generation (SM 3.0) GK10x class
-          { 0x35, 192}, // Kepler Generation (SM 3.5) GK110 class
+	  { 0x35, 192}, // Kepler Generation (SM 3.5) GK110 class
           {   -1, -1 }
         };
 

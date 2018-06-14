@@ -89,6 +89,7 @@ unsigned KernelConfig::setNumberOfBlocks(unsigned lnblocks) {
 }
 unsigned KernelConfig::setNumberOfBlockThreads(unsigned lblocksize) {
 	blocksize = lblocksize;
+	calculate();
 	return blocksize;
 }
 unsigned KernelConfig::setMaxThreadsPerBlock() {

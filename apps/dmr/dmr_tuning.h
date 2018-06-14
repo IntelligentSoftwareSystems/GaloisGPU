@@ -1,0 +1,3 @@
+#pragma once
+#define CHECK_TRIANGLES_BLKSIZE 480
+#define REFINE_BLKSIZE 64

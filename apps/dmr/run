@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./run-all.sh -r1

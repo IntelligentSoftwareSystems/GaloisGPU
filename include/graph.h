@@ -32,13 +32,13 @@ typedef struct Graph {
 
 	__device__ void printStats1x1();
 	__device__ void print1x1();
-	__device__ unsigned getOutDegree(unsigned src);
+	__device__ __host__ unsigned getOutDegree(unsigned src);
 	__device__ unsigned getInDegree(unsigned src);
-	__device__ unsigned getDestination(unsigned src, unsigned nthedge);
-	__device__ foru    getWeight(unsigned src, unsigned nthedge);
+	__device__ __host__ unsigned getDestination(unsigned src, unsigned nthedge);
+	__device__ __host__ foru    getWeight(unsigned src, unsigned nthedge);
 	__device__ unsigned getMinEdge(unsigned src);
 
-	__device__ unsigned getFirstEdge(unsigned src);
+	__device__ __host__ unsigned getFirstEdge(unsigned src);
 	__device__ unsigned findStats();
 	__device__ void computeStats();
 	__device__ bool computeLevels();
@@ -62,14 +62,19 @@ typedef struct Graph {
 
 static unsigned CudaTest(char *msg);
 
+__host__ 
 __device__ unsigned Graph::getOutDegree(unsigned src) {
 	if (src < nnodes) {
 		return noutgoing[src];
 	}
+
+#ifdef __CUDA_ARCH__
 	unsigned id = blockIdx.x * blockDim.x + threadIdx.x;
 	printf("Error: %s(%d): thread %d, node %d out of bounds %d.\n", __FILE__, __LINE__, id, src, nnodes); 
+#endif
 	return 0;
 }
+
 __device__ unsigned Graph::getInDegree(unsigned dst) {
 	if (dst < nnodes) {
 		return nincoming[dst];
@@ -78,8 +83,11 @@ __device__ unsigned Graph::getInDegree(unsigned dst) {
 	printf("Error: %s(%d): thread %d, node %d out of bounds %d.\n", __FILE__, __LINE__, id, dst, nnodes); 
 	return 0;
 }
+__host__
 __device__ unsigned Graph::getDestination(unsigned src, unsigned nthedge) {
+#ifdef __CUDA_ARCH__	
 	unsigned id = blockIdx.x * blockDim.x + threadIdx.x;
+#endif
 	if (src < nnodes && nthedge < getOutDegree(src)) {
 		unsigned edge = getFirstEdge(src) + nthedge;
 		if (edge && edge < nedges + 1) {
@@ -88,15 +96,17 @@ __device__ unsigned Graph::getDestination(unsigned src, unsigned nthedge) {
 		////printf("Error: %s(%d): thread %d, node %d: edge %d out of bounds %d.\n", __FILE__, __LINE__, id, src, edge, nedges + 1);
 		return nnodes;
 	}
+#ifdef __CUDA_ARCH__	
 	if (src < nnodes) {
 		printf("Error: %s(%d): thread %d, node %d: edge %d out of bounds %d.\n", __FILE__, __LINE__, id, src, nthedge, getOutDegree(src));
 	} else {
 		printf("Error: %s(%d): thread %d, node %d out of bounds %d.\n", __FILE__, __LINE__, id, src, nnodes);
 	}
+#endif
 	return nnodes;
 }
+__host__
 __device__ foru Graph::getWeight(unsigned src, unsigned nthedge) {
-	unsigned id = blockIdx.x * blockDim.x + threadIdx.x;
 	if (src < nnodes && nthedge < getOutDegree(src)) {
 		unsigned edge = getFirstEdge(src) + nthedge;
 		if (edge && edge < nedges + 1) {
@@ -105,26 +115,32 @@ __device__ foru Graph::getWeight(unsigned src, unsigned nthedge) {
 		////printf("Error: %s(%d): thread %d, node %d: edge %d out of bounds %d.\n", __FILE__, __LINE__, id, src, edge, nedges + 1);
 		return MYINFINITY;
 	}
+#ifdef __CUDA_ARCH__
+	unsigned id = blockIdx.x * blockDim.x + threadIdx.x;
+
 	if (src < nnodes) {
 		printf("Error: %s(%d): thread %d, node %d: edge %d out of bounds %d.\n", __FILE__, __LINE__, id, src, nthedge, getOutDegree(src));
 	} else {
 		printf("Error: %s(%d): thread %d, node %d out of bounds %d.\n", __FILE__, __LINE__, id, src, nnodes);
 	}
+#endif
 	return MYINFINITY;
 }
 
+__host__
 __device__ unsigned Graph::getFirstEdge(unsigned src) {
-	unsigned id = blockIdx.x * blockDim.x + threadIdx.x;
 	if (src < nnodes) {
 		unsigned srcnout = getOutDegree(src);
 		//if (src == 368) printf("nout[368]=%d, psrc[srcsrc[368]]=%d, psrc[368]=%d, srcsrc[368]=%d.\n", srcnout, psrc[srcsrc[src]], psrc[src], srcsrc[src]);
 		if (srcnout > 0 && srcsrc[src] < nnodes) {
 			return psrc[srcsrc[src]];
 		}
-		printf("Error: %s(%d): thread %d, edge %d out of bounds %d.\n", __FILE__, __LINE__, id, 0, srcnout);
-		return 0;
 	}
+#ifdef __CUDA_ARCH__
+	unsigned id = blockIdx.x * blockDim.x + threadIdx.x;
+
 	printf("Error: %s(%d): thread %d, node %d out of bounds %d.\n", __FILE__, __LINE__, id, src, nnodes);
+#endif
 	return 0;
 }
 __device__ unsigned Graph::getMinEdge(unsigned src) {
@@ -329,6 +345,7 @@ unsigned Graph::optimize() {
 void Graph::progressPrint(unsigned maxii, unsigned ii) {
 	const unsigned nsteps = 10;
 	unsigned ineachstep = (maxii / nsteps);
+	if(ineachstep == 0) ineachstep = 1;
 	/*if (ii == maxii) {
 		printf("\t100%%\n");
 	} else*/ if (ii % ineachstep == 0) {
@@ -410,6 +427,9 @@ unsigned Graph::readFromGR(char file[]) {
     		abort();
   	}
 
+	double starttime, endtime;
+	starttime = rtclock();
+
   	//parse file
   	uint64_t* fptr = (uint64_t*)m;
   	__attribute__((unused)) uint64_t version = le64toh(*fptr++);
@@ -424,6 +444,7 @@ unsigned Graph::readFromGR(char file[]) {
   	fptr32 += numEdges;
   	if (numEdges % 2) fptr32 += 1;
   	unsigned  *edgeData = (unsigned *)fptr32;
+
 	
 	// cuda.
 	nnodes = numNodes;
@@ -458,6 +479,11 @@ unsigned Graph::readFromGR(char file[]) {
 	}
 
 	cfile.close();	// probably galois doesn't close its file due to mmap.
+
+	endtime = rtclock();
+
+	printf("read %lld bytes in %0.2f ms (%0.2f MB/s)\n", masterLength, 1000 * (endtime - starttime), (masterLength / 1048576) / (endtime - starttime));
+
 	return 0;
 }
 unsigned Graph::read(char file[]) {

@@ -8,7 +8,8 @@ struct ComponentSpace {
 	__device__ bool unify(unsigned one, unsigned two);
 	__device__ void print1x1();
 	__host__   void print();
-
+        __host__   void copy(ComponentSpace &two);
+        void dump_to_file(const char *F);
 	void allocate();
 	void init();
 	unsigned numberOfComponentsHost();
@@ -23,6 +24,34 @@ ComponentSpace::ComponentSpace(unsigned nelements) {
 
 	allocate();
 	init();
+}
+
+void ComponentSpace::dump_to_file(const char *F)
+{
+  static FILE *f;
+  static unsigned *mem;
+
+  if(!f)
+    {
+      f = fopen(F, "w");
+      mem = (unsigned *) calloc(nelements, sizeof(unsigned));
+    }
+
+  assert(cudaMemcpy(mem, ele2comp, nelements * sizeof(unsigned), cudaMemcpyDeviceToHost) == cudaSuccess);
+
+  int i;
+  for(i = 0; i < nelements; i++)
+    {
+      fprintf(f, "%d %d\n", i, mem[i]);
+    }
+  fprintf(f, "\n");
+}
+
+void ComponentSpace::copy(ComponentSpace &two)
+{
+  assert(cudaMemcpy(two.ncomponents, ncomponents, sizeof(unsigned), cudaMemcpyDeviceToDevice) == 0);
+  assert(cudaMemcpy(two.ele2comp, ele2comp, sizeof(unsigned) * nelements, cudaMemcpyDeviceToDevice) == 0);
+  assert(cudaMemcpy(two.complen, complen, sizeof(unsigned) * nelements, cudaMemcpyDeviceToDevice) == 0);
 }
 __device__ void ComponentSpace::print1x1() {
 	printf("\t\t-----------------\n");
@@ -76,7 +105,7 @@ void ComponentSpace::init() {
 	cudaMemcpy(ncomponents, &nelements, sizeof(unsigned), cudaMemcpyHostToDevice);
 }
 __device__ bool ComponentSpace::isBoss(unsigned element) {
-	return ele2comp[element] == element;
+  return atomicCAS(&ele2comp[element],element,element) == element;
 }
 __device__ unsigned ComponentSpace::find(unsigned lelement, bool compresspath/*= true*/) {
 	// do we need to worry about concurrency in this function?
@@ -84,7 +113,7 @@ __device__ unsigned ComponentSpace::find(unsigned lelement, bool compresspath/*=
 	// for other unifys, synchornization is not required considering that unify is going to affect only bosses, while find is going to affect only non-bosses.
 	unsigned element = lelement;
 	while (isBoss(element) == false) {
-		element = ele2comp[element];
+	  element = ele2comp[element];
 	}
 	if (compresspath) ele2comp[lelement] = element;	// path compression.
 	return element;
@@ -94,10 +123,15 @@ __device__ bool ComponentSpace::unify(unsigned one, unsigned two) {
 	// while this is true for MST, due to load-balancing in if-block below, a node may be source multiple times.
 	// if a component is source in one thread and destination is another, then it is okay for MST.
     do {
-	unsigned onecomp = find(one, false);
-	unsigned twocomp = find(two, false);
+      if(!isBoss(one)) return false;
+      if(!isBoss(two)) return false;
 
-	if (onecomp == twocomp) return false;
+      unsigned onecomp = one;
+      unsigned twocomp = two;
+      //unsigned onecomp = find(one, false);
+      //unsigned twocomp = find(two, false);
+
+      if (onecomp == twocomp) return false; // "duplicate" edges due to symmetry
 
 	unsigned boss = twocomp;
 	unsigned subordinate = onecomp;
@@ -108,11 +142,13 @@ __device__ bool ComponentSpace::unify(unsigned one, unsigned two) {
 	}
 	// merge subordinate into the boss.
 	//ele2comp[subordinate] = boss;
-	unsigned oldboss = atomicExch(&ele2comp[subordinate], boss);
+
+	unsigned oldboss = atomicCAS(&ele2comp[subordinate], subordinate, boss);
 	if (oldboss != subordinate) {	// someone else updated the boss.
 		// we need not restore the ele2comp[subordinate], as union-find ensures correctness and complen of subordinate doesn't matter.
 		one = oldboss;
 		two = boss;
+		return false;
 	} else {
 		dprintf("\t\tunifying %d -> %d (%d)\n", subordinate, boss);
 		atomicAdd(&complen[boss], complen[subordinate]);

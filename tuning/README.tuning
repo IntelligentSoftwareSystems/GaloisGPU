@@ -1,0 +1,53 @@
+We use OpenTuner (http://opentuner.org/) to find thread block sizes
+for all the benchmarks in LonestarGPU (LSG).
+
+We also supply configurations that are known to work well with LSG on
+our devices (Fermi and Kepler). The default configuration, as shipped,
+is for a Fermi-based device.
+
+This document tells you how to switch between default configurations
+and also how to autotune LSG to your device.
+
+NOTE: You do not need OpenTuner to use the configurations supplied
+with LonestarGPU. However, you do need OpenTuner if you wish to
+autotune LSG to your configuration.
+
+
+HOW TO SWITCH TO A SUPPLIED CONFIGURATION
+-----------------------------------------
+
+The tunelsg.py tool allows you to "load" and "save"
+configurations. All configurations are saved in the
+$LSGDIR/tuning/configs/ directory. 
+
+The name of a configuration is the same as that of its directory.
+
+To load the "fermi" configuration:
+
+  $LSGDIR/tuning/tunelsg.py load fermi
+
+This will copy files from config/fermi to the correct locations while
+making backups of the files replaced. By default, upto 5 backups are
+maintained.
+
+
+HOW TO RUN OPENTUNER
+--------------------
+
+Install opentuner so that it is available under the $LSGDIR/tuning
+directory as $LSGDIR/tuning/opentuner/
+
+Then, in $LSGDIR/tuning, run:
+
+  make setup
+
+For each app in $LSGDIR/apps that you want to tune, switch to apps
+directory and run:
+
+  make tuning
+
+After you are done tuning, you can save the tuned values as a
+custom configuration:
+
+  $LSGDIR/tuning/tunelsg.py save your-custom-config-name
+
