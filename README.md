@@ -20,7 +20,9 @@ https://github.com/NVlabs/moderngpu/releases
 You will need to download CUB and Mgpu in the root directory:
 
 $ cd $LSGDIR
+
 $ ln -s path-to-cub-x.y/ cub
+
 $ ln -s path-to-mgpu-x.y/ mgpu
 
 ### BUILDING
@@ -34,6 +36,7 @@ $ make # compiles all applications
 ## Running
 
 $ make
+
 $ ./test /path/to/graph/file
 
 #### Example:
