@@ -3,19 +3,19 @@
 The LonestarGPU (LSG) suite contains CUDA implementations of several
 irregular algorithms that exhibit amorphous data parallelism.
 
-##INSTALLATION
+## INSTALLATION
 
 
 ### Software pre-requisites
 
 * CUB (v1.3.1 or later)
 
-[https://github.com/NVlabs/cub]
+https://github.com/NVlabs/cub
 
 
 * ModernGPU (v1.1 or later)
 
-[https://github.com/NVlabs/moderngpu/releases]
+https://github.com/NVlabs/moderngpu/releases
 
 You will need to download CUB and Mgpu in the root directory:
 
