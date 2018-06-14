@@ -3,10 +3,10 @@
 The LonestarGPU (LSG) suite contains CUDA implementations of several
 irregular algorithms that exhibit amorphous data parallelism.
 
-## INSTALLATION
+# INSTALLATION
 
 
-### Software pre-requisites
+## Software pre-requisites
 
 * CUB (v1.3.1 or later)
 
@@ -25,7 +25,7 @@ $ ln -s path-to-cub-x.y/ cub
 
 $ ln -s path-to-mgpu-x.y/ mgpu
 
-### BUILDING
+## BUILDING
 
 Assuming you're in $LSGDIR:
 
@@ -33,7 +33,7 @@ $ make inputs # downloads the inputs required for LSG
 
 $ make # compiles all applications
 
-## Running
+# Running
 
 $ make
 
