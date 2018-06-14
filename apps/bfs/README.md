@@ -1,9 +1,6 @@
 ## DISCRIPTION 
 
-This benchmark performs breadth-first search on an input graph, starting from source node. This program is based on Merill et al BFS-hybrid.
-
-
-## ALGORITHM
+This benchmark performs breadth-first search on an input graph, starting from source node. This program is based on [https://mgarland.org/files/papers/gpubfs.pdf](this paper).
 
 
 ## BUILD
