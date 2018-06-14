@@ -36,9 +36,10 @@ $ make # compiles all applications
 $ make
 $ ./test /path/to/graph/file
 
-Example:
+#### Example:
 
-$ cd $apps/bfs
+$ cd apps/bfs
+
 $ ./test /path/to/NY.gr -o output-NY
 
 
