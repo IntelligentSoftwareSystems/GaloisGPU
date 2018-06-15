@@ -8,6 +8,5 @@ Run make in the root directory or source file (e.g. apps/pta)
 
 ## RUN
 
-
 Execute as:  ./pta NODES-FILE CONSTRAINTS-FILE HCD-TABLE SOLUTION-FILE [TRANSFER, VERIFY]
 
