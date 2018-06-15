@@ -8,7 +8,7 @@ maintained by Shewchuk:
 
 https://www.cs.cmu.edu/~quake/triangle.research.html
 
-## COMPILING
+## BUILD
 
 Run make in root directory or source files (e.g. apps/dmr)
 
