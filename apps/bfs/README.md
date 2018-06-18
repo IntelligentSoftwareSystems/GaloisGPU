@@ -1,6 +1,6 @@
 ## DISCRIPTION 
 
-This benchmark performs breadth-first search on an input graph, starting from source node. This program is based on [https://mgarland.org/files/papers/gpubfs.pdf](this paper).
+This benchmark performs breadth-first search on an input graph, starting from source node. This program is based on (https://mgarland.org/files/papers/gpubfs.pdf)[this paper].
 
 
 ## BUILD
