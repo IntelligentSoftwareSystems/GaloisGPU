@@ -12,7 +12,7 @@ Run make in the root directory or the source directory (e.g. apps/sssp)
 
 ## RUN
 
-./test path-to-graph -o output -d delta
+./sssp path-to-graph -o output -d delta
 
 
 
