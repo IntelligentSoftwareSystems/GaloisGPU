@@ -1,4 +1,4 @@
-# expect to be in ROOT/gensrc/app/
+# expect to be in ROOT/app/
 
 INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include
 LIBDIR=../../rt/lib
