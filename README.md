@@ -64,6 +64,11 @@ cd apps/bfs
 ./test /path/to/NY.gr -o output-NY
 ```
 
+#Documentation
+Further documentation is available at
+[http://iss.ices.utexas.edu/?p=projects/galois/lonestargpu](http://iss.ices.utexas.edu/?p=projects/galois/lonestargpu)
+
+
 # Contact Us 
 
 For bugs, please raise an issue here at gihub using the 'Issues' tab [https://github.com/IntelligentSoftwareSystems/GaloisGPU/issues](https://github.com/IntelligentSoftwareSystems/GaloisGPU/issues).
