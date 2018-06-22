@@ -64,7 +64,8 @@ cd apps/bfs
 ./test /path/to/NY.gr -o output-NY
 ```
 
-#Documentation
+# Documentation
+
 Further documentation is available at
 [http://iss.ices.utexas.edu/?p=projects/galois/lonestargpu](http://iss.ices.utexas.edu/?p=projects/galois/lonestargpu)
 
