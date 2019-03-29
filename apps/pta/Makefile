@@ -3,7 +3,8 @@ APP=pta
 SRC=main.cu
 INC=andersen.h andersen.cu pta_tuning.h
 
-include ../common.mk
+include ../../arch.mk
+include ../../common.mk
 
 .phony: tuning
 

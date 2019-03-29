@@ -1,5 +1,5 @@
 TOPLEVEL := .
-IRAPPS := bfs mst sssp sgd dmr
+IRAPPS := bfs mst sssp sgd dmr mis
 APPS := bh pta
 INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu2-inputs.tar.bz2
 BIP_INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu21-bipartite-inputs.tar.xz
@@ -16,7 +16,8 @@ $(APPS):
 
 $(IRAPPS):
 	make -C apps/$@
-include apps/common.mk
+include arch.mk
+include common.mk
 
 inputs:
 	@echo "Downloading inputs ..."

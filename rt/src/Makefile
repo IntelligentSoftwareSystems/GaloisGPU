@@ -1,6 +1,6 @@
+include ../../arch.mk
 INCLUDES=-I../include -I../include/mgpu/include
 LIBDIR=../lib
-GENCODE=-gencode arch=compute_20,code=sm_20 -gencode arch=compute_35,code=sm_35 -gencode arch=compute_52,code=sm_52
 SNAPPY_INC=~/.local/include
 SNAPPY_LIB=~/.local/lib
 
@@ -34,7 +34,7 @@ instr.o: instr.cu ../include/instr.h
 snappy.o: ../include/snfile.h
 
 %.o: %.cu
-	nvcc -g -dc -O3 $(GENCODE) $(INCLUDES) $(NVCCFLAGS) $< -o $@ $(SNAPPY)
+	nvcc -g -dc -O3 $(CUDA_ARCH) $(INCLUDES) $(NVCCFLAGS) $< -o $@ $(SNAPPY)
 
 %.o: %.c
 	gcc -O3 -g -c $(INCLUDES) $< -o $@ $(SNAPPY)
@@ -43,7 +43,7 @@ snappy_test: snappy_test.o snappy.o
 	gcc -g $(INCLUDES) $^ -o $@ $(SNAPPY)
 
 %.link.o: %.o %.cu
-	nvcc -g -dlink -O3 $(GENCODE) $(INCLUDES) $(NVCCFLAGS) $< -o $@
+	nvcc -g -dlink -O3 $(CUDA_ARCH) $(INCLUDES) $(NVCCFLAGS) $< -o $@
 
 clean: 
 	rm -f $(LIBDIR)/libggrt.a

@@ -32,7 +32,7 @@ __global__ void check_triangles(Mesh mesh, unsigned int * bad_triangles, int sta
   unsigned tid = TID_1D;
   unsigned nthreads = TOTAL_THREADS_1D;
 
-  const unsigned __kernel_tb_size = TB_SIZE;
+  //const unsigned __kernel_tb_size = TB_SIZE;
   if (tid == 0)
     in_wl.reset_next_slot();
 
@@ -70,7 +70,7 @@ __global__ void __launch_bounds__(TB_SIZE) refine(Mesh mesh, int debg, uint * nn
   unsigned tid = TID_1D;
   unsigned nthreads = TOTAL_THREADS_1D;
 
-  const unsigned __kernel_tb_size = TB_SIZE;
+  //const unsigned __kernel_tb_size = TB_SIZE;
   if (tid == 0)
     in_wl.reset_next_slot();
 
@@ -83,10 +83,10 @@ __global__ void __launch_bounds__(TB_SIZE) refine(Mesh mesh, int debg, uint * nn
   uint nc = 0;
   uint boundary[BCLEN] ;
   uint bc = 0;
-  uint blnodes[BCLEN/4] ;
+  //uint blnodes[BCLEN/4] ;
   bool repush = false;
   int stage = 0;
-  int x = 0;
+  //int x = 0;
   // FP: "2 -> 3;
   wlele_end = *((volatile index_type *) (in_wl).dindex);
   wlele_rup = ((0) + roundup(((*((volatile index_type *) (in_wl).dindex)) - (0)), (nthreads)));
@@ -192,7 +192,7 @@ void refine_mesh(ShMesh& mesh, dim3 blocks, dim3 threads)
   Mesh gmesh (mesh);
   Shared<uint> nelements (1);
   Shared<uint> nnodes (1);
-  int cnbad ;
+  //int cnbad ;
   bool orig = false;
   ggc::Timer t ("total");
   // FP: "2 -> 3;

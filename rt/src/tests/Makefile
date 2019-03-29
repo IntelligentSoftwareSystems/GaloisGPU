@@ -1,5 +1,5 @@
+include ../../arch.mk
 INCLUDES=-I../../include
-CUDA_ARCH=sm_20
 
 la: la.cu ../../include/lockarray.h
 	nvcc -O3 -arch $(CUDA_ARCH) $(INCLUDES) $< -o $@
