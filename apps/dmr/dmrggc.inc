@@ -827,7 +827,7 @@ void refine_mesh_orig(ShMesh &mesh, dim3 &blocks, dim3 &threads)
   *(nelements.cpu_wr_ptr(true)) = mesh.nelements;
   *(nnodes.cpu_wr_ptr(true)) = mesh.nnodes;
 
-  double starttime, endtime;
+  //double starttime, endtime;
   int lastnelements = 0;
   Worklist2 *inwl = &wl1, *outwl = &wl2;
 
@@ -874,6 +874,6 @@ void refine_mesh_orig(ShMesh &mesh, dim3 &blocks, dim3 &threads)
   check_triangles_orig<<<nSM, threads.x>>>(gmesh, nbad.gpu_wr_ptr(), 0, *outwl, *inwl); 
   cnbad = *(nbad.cpu_rd_ptr());
   printf("%d final bad triangles\n", cnbad);
-  printf("time: %f ms\n", (endtime - starttime) * 1000);
-  printf("\truntime [dmr] = %f ms\n", (endtime - starttime) * 1000);
+  //printf("time: %f ms\n", (endtime - starttime) * 1000);
+  //printf("\truntime [dmr] = %f ms\n", (endtime - starttime) * 1000);
 }

@@ -111,9 +111,9 @@ __global__ void sgd_blk_diag_operator(float *fv,int *metadata, float *new_rating
 	int newVariable5;
 	float _P4[C];
 	float _P5[R];
-	int t4;
-	int t6;
-	int t8;
+	//int t4;
+	//int t6;
+	//int t8;
 	int t10;
 	int t12;
 	int movie_size = metadata[2];
@@ -609,34 +609,35 @@ struct SGDAsynEdgeCudaFunctor {
 			int iter) {
 
 
-		int t8;
 		int t6;
 		int t4;
 		int t2;
 		int newVariable4;
 		int newVariable3;
 		int newVariable2;
-		int In_3;
-		int In_2;
-		int In_1;
-		int _t39;
-		int _t38;
-		int _t37;
 		struct a_list *_P_DATA4;
 		int newVariable1;
 		int newVariable0;
 		struct mk *_P_DATA3;
 		struct a_list **_P1;
-		int *_P_DATA2;
 		int chill_count_1;
 		int *_P_DATA1;
+		int _t31;
+		int _t34;
+		/*
+		int t8;
+		int *_P_DATA2;
 		int chill_count_0;
+		int _t39;
+		int _t38;
+		int _t37;
+		int In_3;
+		int In_2;
+		int In_1;
 		int _t36;
 		int _t35;
-		int _t34;
 		int _t33;
 		int _t32;
-		int _t31;
 		int _t30;
 		int _t29;
 		int _t28;
@@ -669,6 +670,7 @@ struct SGDAsynEdgeCudaFunctor {
 		int i;
 		int j;
 		int k;
+		*/
 		_P_DATA1 = (int *)malloc(sizeof(int ) * (users/C + movies/R));
 		_P1 = (struct a_list **)malloc(sizeof(struct a_list *) * (users/C + movies/R - 1));
 		_P_DATA1[0] = 0;

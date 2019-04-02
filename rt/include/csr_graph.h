@@ -112,7 +112,8 @@ struct CSRGraphTex : CSRGraph {
   unsigned allocOnDevice();
 
   __device__ __host__ index_type getOutDegree(unsigned src) {
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if 0
     assert(src < nnodes);
     return tex1Dfetch<index_type>(row_start_tx, src+1) - 
       tex1Dfetch<index_type>(row_start_tx, src);
@@ -127,7 +128,8 @@ struct CSRGraphTex : CSRGraph {
   }
 
   __device__ __host__ index_type getDestination(unsigned src, unsigned edge) {
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if 0
       assert(src < nnodes);
       assert(edge < getOutDegree(src));
 
@@ -142,7 +144,8 @@ struct CSRGraphTex : CSRGraph {
   };
 
   __device__ __host__ index_type getAbsDestination(unsigned abs_edge) {
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if 0
     assert(abs_edge < nedges);
   
     return tex1Dfetch<index_type>(edge_dst_tx, abs_edge);
@@ -152,7 +155,8 @@ struct CSRGraphTex : CSRGraph {
   };
 
   __device__ __host__ index_type getFirstEdge(unsigned src) {
-#ifdef __CUDA_ARCH__
+//#ifdef __CUDA_ARCH__
+#if 0
     assert(src <= nnodes); // <= is okay
     return tex1Dfetch<index_type>(row_start_tx, src);
 #else

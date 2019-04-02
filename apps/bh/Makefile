@@ -3,7 +3,8 @@ APP=bh
 SRC=main.cu
 INC=bh_tuning.h
 
-include ../common.mk
+include ../../arch.mk
+include ../../common.mk
 
 .phony: tuning
 

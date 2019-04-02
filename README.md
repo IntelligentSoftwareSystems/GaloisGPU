@@ -39,6 +39,8 @@ ln -s path-to-cub-x.y/ cub
 ln -s path-to-mgpu-x.y/ mgpu
 ```
 
+To compile for a specific GPU architecture, make changes to the arch.mk file in the top directory.
+
 ## BUILDING
 
 
