@@ -23,6 +23,7 @@
 void kernel_sizing(CSRGraphTex &, dim3 &, dim3 &);
 #define TB_SIZE 256
 const char *GGC_OPTIONS = "coop_conv=False $ outline_iterate_gb=True $ backoff_blocking_factor=4 $ parcomb=True $ np_schedulers=set(['fg', 'wp']) $ cc_disable=set([]) $ hacks=set([]) $ np_factor=8 $ instrument=set([]) $ unroll=[] $ instrument_mode=None $ read_props=None $ outline_iterate=True $ ignore_nested_errors=False $ np=True $ write_props=None $ quiet_cgen=True $ retry_backoff=True $ cuda.graph_type=texture $ cuda.use_worklist_slots=True $ cuda.worklist_type=basic";
+extern int start_node;
 extern int DELTA;
 typedef int edge_data_type;
 typedef int node_data_type;
@@ -394,7 +395,7 @@ void gg_main(CSRGraphTex& hg, CSRGraphTex& gg)
   if(!remove_dups_barrier_inited) { remove_dups_barrier.Setup(remove_dups_blocks); remove_dups_barrier_inited = true;};
   // FP: "4 -> 5;
   // FP: "5 -> 6;
-  kernel <<<blocks, threads>>>(gg, 0);
+  kernel <<<blocks, threads>>>(gg, start_node);
   // FP: "6 -> 7;
   int i = 0;
   int curdelta = 0;
@@ -404,7 +405,7 @@ void gg_main(CSRGraphTex& hg, CSRGraphTex& gg)
   glevel = level.gpu_wr_ptr();
   // FP: "9 -> 10;
   pipe = PipeContextT<Worklist2>(gg.nedges*2);
-  pipe.in_wl().wl[0] = 0;
+  pipe.in_wl().wl[0] = start_node;
   pipe.in_wl().update_gpu(1);
   gg_main_pipe_1_wrapper(gg,glevel,curdelta,i,DELTA,remove_dups_barrier,remove_dups_blocks,pipe,blocks,threads);
   pipe.free();

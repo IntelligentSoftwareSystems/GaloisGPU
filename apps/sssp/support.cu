@@ -20,11 +20,12 @@
 #include "gg.h"
 #include <cassert>
 
-const char *prog_opts = "d:";
-const char *prog_usage = "[-d delta]";
+const char *prog_opts = "d:s:";
+const char *prog_usage = "[-d delta] [-s] startNode";
 const char *prog_args_usage = "";
 
 int DELTA = 10000;
+int start_node = 0;
 extern const int INF;
 
 int process_prog_arg(int argc, char *argv[], int arg_start) {
@@ -35,6 +36,10 @@ void process_prog_opt(char c, char *optarg) {
   if(c == 'd') {
     DELTA = atoi(optarg);
     assert(DELTA > 0);
+  }
+  if(c == 's') {
+    start_node = atoi(optarg);
+    assert(start_node > 0);
   }
 }
 
