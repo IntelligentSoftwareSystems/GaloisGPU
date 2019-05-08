@@ -80,7 +80,7 @@ int load_graph_and_run_kernel(char *graph_file) {
 void usage(int argc, char *argv[]) 
 {
   if(strlen(prog_usage)) 
-    fprintf(stderr, "usage: %s [-q] [-g gpunum] [-o output-file] %s graph-file %s\n", argv[0], prog_usage, prog_args_usage);
+    fprintf(stderr, "usage: %s [-q] [-g gpunum] [-o output-file] %s graph-file \n %s\n", argv[0], prog_usage, prog_args_usage);
   else
     fprintf(stderr, "usage: %s [-q] [-g gpunum] [-o output-file] graph-file %s\n", argv[0], prog_args_usage);
 }

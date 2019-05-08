@@ -14,3 +14,9 @@
 
 #define TID_1D (threadIdx.x + blockIdx.x * blockDim.x)
 #define TOTAL_THREADS_1D (gridDim.x * blockDim.x)
+#define BLOCK_DIM_X blockDim.x
+
+#define CONDITION enable_lb
+#define MAX_INT 2147483647
+#define THRESHOLD TOTAL_THREADS_1D
+#define DEGREE_LIMIT ((CONDITION) ? (THRESHOLD) : (MAX_INT))
