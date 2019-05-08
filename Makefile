@@ -1,7 +1,6 @@
 TOPLEVEL := .
-IRAPPS := bfs mst sssp sgd dmr mis cc pr
+IRAPPS := bfs mst sssp sgd dmr mis cc pr triangle
 APPS := bh pta
-APPS := 
 INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu2-inputs.tar.bz2
 BIP_INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu21-bipartite-inputs.tar.xz
 INPUT := lonestargpu2-inputs.tar.bz2
