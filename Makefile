@@ -6,10 +6,13 @@ BIP_INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargp
 INPUT := lonestargpu2-inputs.tar.bz2
 BIP_INPUT := lonestargpu21-bipartite-inputs.tar.xz
 
-.PHONY: all clean inputs
+.PHONY: rt all clean inputs
 
-all: $(APPS)
+all: rt $(APPS)
 	for IRAPPS in $(IRAPPS); do make -C apps/$$IRAPPS; done
+
+rt: 
+	make -C rt/src
 
 $(APPS):
 	make -C apps/$@

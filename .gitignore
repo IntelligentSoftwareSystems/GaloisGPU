@@ -31,6 +31,12 @@ apps/mst/mst
 apps/mst/mst_nontex
 apps/pta/pta
 apps/sgd/blk_diag
+apps/cc/cc
+apps/mis/mis
+apps/pr/pr
+apps/sgd/sgd
+apps/triangle/triangle
+apps/triangle/triangle_nontex
 cub
 inputs/
 mgpu

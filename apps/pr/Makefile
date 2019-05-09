@@ -28,7 +28,7 @@ $(SKELAPP)/mgpucontext.o: ../../rt/include/mgpu/src/mgpucontext.cu
 $(SKELAPP)/mgpuutil.o: ../../rt/include/mgpu/src/mgpuutil.cpp
 	nvcc -dc $(CUDA_ARCH) $(EXTRAFLAGS) $(NVCCFLAGS) $(INCLUDES) $< -o $@
 
-$(SKELAPP)/skel.o: $(SKELAPP)/skel.cu
+skel.o: $(SKELAPP)/skel.cu
 	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) $(EXTRAFLAGS) $(NVCCFLAGS) $(INCLUDES) $< -o $@
 
 %.o: %.cu
@@ -39,17 +39,17 @@ $(SKELAPP)/skel.o: $(SKELAPP)/skel.cu
 	nvcc -cubin -dc $(CUDA_ARCH) $(CXXFLAGS) $(EXTRAFLAGS) $(NVCCFLAGS) $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
 
 
-pr: $(SKELAPP)/skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
+pr: skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
 	nvcc -g $(EXTRAFLAGS) $(CUDA_ARCH) $(CXXFLAGS) $(NVCCFLAGS) $(INCLUDES) -L$(LIBDIR)  -o $@ $^ $(LIBS) -lcudadevrt $(COMPRESS_LIBS)
 	cp $@ ../../bin
 
-pr-dp: $(SKELAPP)/skel.o kernel.o support.o
+pr-dp: skel.o kernel.o support.o
 	nvcc $(EXTRAFLAGS) -g $(CUDA_ARCH) $(NVCCFLAGS) $(INCLUDES) -o $@ $^ -lcudadevrt -L$(LIBDIR) $(LIBS) 
 
 .phony: backup compare clean
 
 clean:
-	rm -f pr $(SKELAPP)/skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
+	rm -f pr skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
 
 backup: kernel.cu.1
 
