@@ -20,5 +20,6 @@ Run make in the root directory or in the source folder (e.g. apps/pr)
 ## RUN
 
 Execute as: ./pr [-o output-file] [-t top_ranks] [-x max_iterations] graph-file 
+
 e.g., ./pr -o outfile.txt -x 1000000 road-USA.gr
 
