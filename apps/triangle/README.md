@@ -12,4 +12,5 @@ Run make in the root directory or in the source folder (e.g. apps/triangle)
 ## RUN
 
 Execute as: ./triangle [-o output-file] <undirected-graph-file>
+
 e.g., ./triangle -o outfile.txt road-USA.sgr
