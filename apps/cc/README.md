@@ -8,6 +8,6 @@ Run make in the root directory or in the source folder (e.g. apps/cc)
 
 ## RUN
 
-Execute as: ./cc [-o output-file] <undirected-graph-file>
+Execute as: ./cc [-o output-file] undirected-graph-file
 
 e.g., ./cc -o outfile.txt road-USA.sgr
