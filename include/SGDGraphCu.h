@@ -165,6 +165,7 @@ struct SGD_LC_LinearArray_Undirected_Graph {
          for (unsigned int idx = start; idx < end; ++idx) {
             //node i's idx neighbor is to be populated here.
             out_edge_data()[displacement] = *le64toh(edgeData+idx);
+            //out_edge_data()[displacement] = 1;
             out_neighbors()[displacement] = *le64toh(outs+idx);
             displacement++;
          }
@@ -208,7 +209,7 @@ struct SGD_LC_LinearArray_Undirected_Graph {
       return out_edge_data();
    }
    unsigned int * get_edge_src() {
-      return out_edge_data() + _num_edges;
+      return (unsigned*)out_edge_data() + _num_edges;
    }
    unsigned int get_edge_src(int edge_index) {
       return get_edge_src()[edge_index];

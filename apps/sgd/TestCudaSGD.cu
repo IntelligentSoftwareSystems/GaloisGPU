@@ -41,7 +41,7 @@ int main(int argc, char ** args) {
    typedef SGDAsynEdgeCudaFunctor SGDFunctorTy;
    fprintf(stderr, "===============================Starting- processing %s\n===============================", fname);
    SGDFunctorTy func(false, fname);
-	func(5);      
+	func(5);
    fprintf(stderr, "====================Terminating - processed%s================================\n", fname);
    std::cout << "Completed successfully!\n";
    return 0;
