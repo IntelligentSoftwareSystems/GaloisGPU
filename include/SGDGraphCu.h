@@ -148,6 +148,7 @@ struct SGD_LC_LinearArray_Undirected_Graph {
 
       _num_nodes = numNodes;
       _num_edges = numEdges;
+      std::cout << "num_nodes: " << _num_nodes << ", num_edges: " << _num_edges << "\n";
       init(_num_nodes, _num_edges);
       //node_data
       memset(node_data(), 0, sizeof(unsigned int) * _num_nodes);
@@ -233,10 +234,10 @@ struct SGD_LC_LinearArray_Undirected_Graph {
    void init(size_t n_n, size_t n_e) {
       _num_nodes = n_n;
       _num_edges = n_e;
-      const int arr_size = (4 + (_num_nodes * SizeNodeData) + (_num_nodes + 1) + (_num_edges) + (_num_edges * SizeEdgeData) + (_num_edges));
-      std::cout << "Allocating NN: " << _num_nodes << "(" << SizeNodeData << ") , NE :" << _num_edges << ", TOTAL:: " << arr_size << "\n";
+      //const int arr_size = (4 + (_num_nodes * SizeNodeData) + (_num_nodes + 1) + (_num_edges) + (_num_edges * SizeEdgeData) + (_num_edges));
+      //std::cout << "Allocating NN: " << _num_nodes << "(" << SizeNodeData << ") , NE :" << _num_edges << ", TOTAL:: " << arr_size << "\n";
       //Num_nodes, num_edges, [node_data] , [outgoing_index], [out_neighbors], [edge_data] , [src indices]
-      fprintf(stderr, "GraphSize :: %6.6g MB\n", arr_size / (float(1024 * 1024)));
+      //fprintf(stderr, "GraphSize :: %6.6g MB\n", arr_size / (float(1024 * 1024)));
       gpu_graph = new int [(4 + (_num_nodes * SizeNodeData) + (_num_nodes + 1) + (_num_edges) + (_num_edges * SizeEdgeData) + (_num_edges))];
       (gpu_graph)[0] = (int) _num_nodes;
       (gpu_graph)[1] = (int) _num_edges;

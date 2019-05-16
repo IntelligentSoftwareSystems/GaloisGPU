@@ -1,7 +1,7 @@
 /* -*- mode: c++ -*- */
 int main(int argc, char *argv[]) {
   ShMesh mesh;
-  int maxfactor = 2;
+  int maxfactor = 20;
   int mesh_nodes, mesh_elements;
   dim3 blocks(14*8), threads(TB_SIZE);
   int no_output = 0;

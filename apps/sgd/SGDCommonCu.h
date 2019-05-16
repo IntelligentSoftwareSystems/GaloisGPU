@@ -215,7 +215,7 @@ static void write_stats_to_file(GraphTy & graph) {
  *
  ************************************************/
 template<typename GraphType, typename FeatureArrayType>
-void compute_err(GraphType & graph, FeatureArrayType * features, int max_rating) {
+float compute_err(GraphType & graph, FeatureArrayType * features, int max_rating) {
    int fail_count = 0;
    float sum = 0;
    for (unsigned int i = 0; i < features->size(); ++i) {
@@ -225,7 +225,7 @@ void compute_err(GraphType & graph, FeatureArrayType * features, int max_rating)
          fail_count++;
       }
    }
-   fprintf(stderr, "Failed:: %6.6g,Sum, %6.6g ", fail_count / (float) (features->size()), sum);
+   //fprintf(stderr, "Failed:: %6.6g,Sum, %6.6g ", fail_count / (float) (features->size()), sum);
    float accumulated_error = 0.0f;
    float max_err = 0.0f;
    for (unsigned int i = 0; i < graph.num_edges(); ++i) {
@@ -242,7 +242,9 @@ void compute_err(GraphType & graph, FeatureArrayType * features, int max_rating)
    accumulated_error /= (float) graph.num_edges();
 //   float rms = std::sqrt((float) accumulated_error);
    float rms = sqrt((float) accumulated_error);
-   fprintf(stderr, "Average_error, %6.6f , max_error, %6.6f, RMS, %6.6f \n", accumulated_error, max_err, rms);
+   //fprintf(stderr, "Average_error %.3f , max_error %.3f, RMS %.5f \n", accumulated_error, max_err, rms);
+   printf("RMS %.5f\n", rms);
+   return rms;
 }
 /************************************************************************
  *
@@ -270,7 +272,7 @@ void initialize_features_random(GraphType & graph, FeatureArrayType * features, 
       if (graph.num_neighbors(i) > 0)
          movies.push_back(i);
    }
-   std::cout << "initial features:: " << feature_sum << " , [" << min_feature << " , " << max_feature;
+   //std::cout << "initial features:: " << feature_sum << " , [" << min_feature << " , " << max_feature;
 }
 /************************************************************************
  *
@@ -294,7 +296,8 @@ void initialize_features_random(GraphType & graph, FeatureArrayType * features, 
       if (graph.num_neighbors(i) > 0)
          movies.push_back(i);
    }
-   std::cout << "initial features:: " << feature_sum << " , [" << min_feature << " , " << max_feature;
+   //std::cout << "initial features:: " << feature_sum << " , [" << min_feature << " , " << max_feature;
+   //std::cout << "initial features: feature_sum " << feature_sum << " min_feature " << min_feature << " max_feature " << max_feature << "\n";
 }
 /************************************************************************
  *
@@ -368,7 +371,7 @@ void compute_err(GraphType & graph) {
 
       }
    }
-   fprintf(stderr, "Failed:: %6.6g,Sum, %6.6g ", fail_count / (float) (graph.num_nodes()*SGD_FEATURE_SIZE), sum);
+   //fprintf(stderr, "Failed:: %6.6g,Sum, %6.6g ", fail_count / (float) (graph.num_nodes()*SGD_FEATURE_SIZE), sum);
    float accumulated_error = 0.0f;
    float max_err = 0.0f;
    typedef typename GraphType::NodeDataType NodeDataType;
@@ -385,7 +388,7 @@ void compute_err(GraphType & graph) {
    }
    accumulated_error /= (float) graph.num_edges();
    float rms = sqrt((float) accumulated_error);
-   fprintf(stderr, "Average_error, %6.6f , max_error, %6.6f, RMS, %6.6f , RatingsSum, %6.6g\n", accumulated_error, max_err, rms,sum_ratings);
+   //fprintf(stderr, "Average_error, %6.6f , max_error, %6.6f, RMS, %6.6f , RatingsSum, %6.6g\n", accumulated_error, max_err, rms,sum_ratings);
 }
 /************************************************
  *

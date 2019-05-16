@@ -39,10 +39,10 @@ int main(int argc, char ** args) {
    if (argc == 2)
       fname = args[1];
    typedef SGDAsynEdgeCudaFunctor SGDFunctorTy;
-   fprintf(stderr, "===============================Starting- processing %s\n===============================", fname);
+   //fprintf(stderr, "===============================Starting- processing %s\n===============================", fname);
    SGDFunctorTy func(false, fname);
 	func(5);
-   fprintf(stderr, "====================Terminating - processed%s================================\n", fname);
-   std::cout << "Completed successfully!\n";
+   //fprintf(stderr, "====================Terminating - processed%s================================\n", fname);
+   //std::cout << "Completed successfully!\n";
    return 0;
 }

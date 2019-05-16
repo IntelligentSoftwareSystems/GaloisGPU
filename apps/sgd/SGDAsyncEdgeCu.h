@@ -248,7 +248,7 @@ struct StatAccumulator{
          sum.insp_time+=s.insp_time;
       }
       size_t num_items = stats.size();
-      fprintf(stderr, "AVG,%6.6g,%6.6g,%6.6g,%6.6g,%6.6g\n", (float)sum.round/num_items, (float)sum.curr_step/num_items,sum.total_time/num_items,sum.total_time/num_items, sum.insp_time/num_items);
+      printf("\nAverage time per iteration: %6.6g\n", sum.total_time/num_items);
    }
 };
 ///
@@ -295,9 +295,11 @@ struct CUDAArray {
 
  ************************************************************************/
 
+//typedef float EdgeDataType;
+typedef unsigned int EdgeDataType;
 
 struct SGDAsynEdgeCudaFunctor {
-	typedef SGD_LC_LinearArray_Undirected_Graph<unsigned int, unsigned int> GraphTy;
+	typedef SGD_LC_LinearArray_Undirected_Graph<unsigned int, EdgeDataType> GraphTy;
 	typedef CUDAArray<int> ArrayType;
 	typedef CUDAArray<float> FeatureArrayType;
 	////////////////////////////////////////////////////////////
@@ -338,12 +340,12 @@ struct SGDAsynEdgeCudaFunctor {
 	SGDAsynEdgeCudaFunctor(bool road, const char * p_filename) :
 		round(0) {
 			strcpy(filename, p_filename);
-			fprintf(stderr, "Creating SGDAsynEdgeCudaFunctor -  features =[%d].\n",
-					SGD_FEATURE_SIZE);
+			//fprintf(stderr, "Creating SGDAsynEdgeCudaFunctor -  features =[%d].\n", SGD_FEATURE_SIZE);
 			graph.read(p_filename);
 			allocate();
 			initialize();
-			fprintf(stderr, "Number of movies found :: %ld\n", movies.size());
+			printf("Feature size: %d\n", SGD_FEATURE_SIZE);
+			//printf("Number of movies found: %ld\n", movies.size());
 		}
 	/************************************************************************
 	 *
@@ -351,8 +353,7 @@ struct SGDAsynEdgeCudaFunctor {
 	SGDAsynEdgeCudaFunctor(int num_m, int num_u) :
 		round(0) {
 			strcpy(filename, "generated-input");
-			fprintf(stderr, "Creating SGDAsynEdgeFunctor -  features =[%d] .\n",
-					SGD_FEATURE_SIZE);
+			//fprintf(stderr, "Creating SGDAsynEdgeFunctor -  features =[%d] .\n", SGD_FEATURE_SIZE);
 			complete_bipartitie(graph, num_m, num_u);
 			allocate();
 			initialize();
@@ -364,8 +365,7 @@ struct SGDAsynEdgeCudaFunctor {
 	SGDAsynEdgeCudaFunctor(int num_m) :
 		round(0) {
 			strcpy(filename, "gen-diagonal-input");
-			fprintf(stderr, "Creating SGDAsynEdgeFunctor -  features =[%d] .\n",
-					SGD_FEATURE_SIZE);
+			//fprintf(stderr, "Creating SGDAsynEdgeFunctor -  features =[%d] .\n", SGD_FEATURE_SIZE);
 			diagonal_graph(graph, num_m);
 			allocate();
 			initialize();
@@ -415,16 +415,17 @@ struct SGDAsynEdgeCudaFunctor {
 			for (device = 0; device < deviceCount; ++device) {
 				cudaDeviceProp deviceProp;
 				cudaGetDeviceProperties(&deviceProp, device);
-				fprintf(stderr, "Device %s (%d) : CC %d.%d, MaxThreads:%d \n",
-						deviceProp.name, device, deviceProp.major,
-						deviceProp.minor, deviceProp.maxThreadsPerBlock);
+				//fprintf(stderr, "Device %s (%d) : CC %d.%d, MaxThreads:%d \n",
+				//		deviceProp.name, device, deviceProp.major,
+				//		deviceProp.minor, deviceProp.maxThreadsPerBlock);
 			}
 
 		}
 		std::vector<int> all_edges;
 		initialize_features_random(graph, features, movies);
 		movies.clear();
-		unsigned int max_degree = 0, max_degree_id = 0;
+		unsigned int max_degree = 0;
+		//unsigned max_degree_id = 0;
 
 		for (unsigned int i = 0; i < graph.num_nodes(); ++i) {
 			for(int j = 0;j < graph.num_neighbors(i); j++){
@@ -439,7 +440,7 @@ struct SGDAsynEdgeCudaFunctor {
 					std::pair<int, int>(i, graph.num_neighbors(i)));
 			if (graph.num_neighbors(i) > max_degree) {
 				max_degree = graph.num_neighbors(i);
-				max_degree_id = i;
+				//max_degree_id = i;
 			}
 			if (graph.num_neighbors(i) > 0) {
 				movies.push_back(i);
@@ -452,9 +453,8 @@ struct SGDAsynEdgeCudaFunctor {
 		for (unsigned int i = 0; i < graph.num_edges(); ++i) {
 			max_rating = std::max(max_rating, graph.out_edge_data()[i]);
 		}
-		fprintf(stderr,
-				"] , max_Rating: %d, movies: %ld, Max degree:: %d for node: %d\n",
-				max_rating, movies.size(), max_degree, max_degree_id);
+		//fprintf(stderr, "] , max_Rating: %d, movies: %ld, Max degree:: %d for node: %d\n",
+		//		max_rating, movies.size(), max_degree, max_degree_id);
 		distribute_chunks(all_edges);
 		cache_chunks(all_edges);
 	}
@@ -518,15 +518,37 @@ struct SGDAsynEdgeCudaFunctor {
 	 *
 	 ************************************************************************/
 	void operator()(int num_steps) {
+		//print_edges();
+		//print_latent();
+		//max_rating = 1;
 		copy_to_device();
 		compute_err(graph, features, max_rating);
 		for (round = 0; round < num_steps; ++round) { 
 			this->gpu_operator();
 			copy_to_host();
-			compute_err(graph, features, max_rating);
+			float rmse = compute_err(graph, features, max_rating);
+			if(rmse < 0.1) break;
 		}
 		stats.print();
+		//print_latent();
+	}
 
+	void print_latent() {
+		for (int n = 0; n < 10; n ++) {
+			FeatureType * features_l = &(features->host_ptr()[n*SGD_FEATURE_SIZE]);
+			printf("latent(%d)[%.3f", n, features_l[0]);
+			for (int i = 1; i < SGD_FEATURE_SIZE; i++)
+				printf(" %.3f", features_l[i]);
+			printf("]\n");
+		}
+	}
+	void print_edges() {
+		std::cout <<  "edges: [" << graph.out_edge_data()[0];
+		for (int n = 1; n < 100; n ++) {
+			if (n >= graph.num_edges()) break;
+			std::cout << ", " << graph.out_edge_data()[n];
+		}
+		printf("]\n");
 	}
 	/************************************************************************
 	 *
@@ -575,6 +597,7 @@ struct SGDAsynEdgeCudaFunctor {
 					(new_index->host_ptr()[iter + 1]
 					 - new_index->host_ptr()[iter]) / (BLOCKSIZE)
 					+ 1;
+					//std::cout << "num_blocks = " << num_blocks << "block_size = " << SGD_FEATURE_SIZE * BLOCKSIZE << "\n";
 				sgd_blk_diag_operator<<<num_blocks, block_size>>>(
 						features->device_ptr(), metadata->device_ptr(),
 						new_ratings->device_ptr(), new_col->device_ptr(),
@@ -593,12 +616,10 @@ struct SGDAsynEdgeCudaFunctor {
 		}
 
 		metadata->copy_to_host();
-		fprintf(stderr, "blk_diag\t%d\t%d\t%6.6g\t%6.6g\t%6.6g\t", round,
-				curr_step, total_time, total_time / (double) count_of_diagonals,
-				insp_time);
-		stats.push_stats(round,
-		                curr_step, total_time, total_time / (double) count_of_diagonals,
-		                insp_time);
+		//fprintf(stderr, "blk_diag: round %d curr_step %d total_time %.3f per_diag_time %6.3g insp_time %.3f\t", round,
+		//		curr_step, total_time, total_time / (double) count_of_diagonals, insp_time);
+		printf("round %d: total_time %.3f\t", round, total_time);
+		stats.push_stats(round, curr_step, total_time, total_time / (double) count_of_diagonals, insp_time);
 
 		delete new_ratings;
 		delete new_index;
@@ -744,7 +765,7 @@ struct SGDAsynEdgeCudaFunctor {
 	 ************************************************************************/
 	~SGDAsynEdgeCudaFunctor() {
 		deallocate();
-		fprintf(stderr, "Destroying SGDAsynEdgeCudaFunctor object.\n");
+		//fprintf(stderr, "Destroying SGDAsynEdgeCudaFunctor object.\n");
 	}
 }
 ;
