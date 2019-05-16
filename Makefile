@@ -33,6 +33,7 @@ inputs:
 	@echo "Inputs available at $(TOPLEVEL)/inputs/"
 
 clean:
+	make -C rt/src clean
 	for APP in $(APPS); do make -C apps/$$APP clean; done 
 	for IRAPPS in $(IRAPPS); do make -C apps/$$IRAPPS clean; done
 

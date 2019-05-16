@@ -49,7 +49,7 @@ sssp-dp: skel.o kernel.o support.o
 .phony: backup compare clean
 
 clean:
-	rm -f sssp skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
+	rm -f sssp sssp_nontex skel.o kernel.o support.o kernel-nontex.o support-nontex.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
 
 backup: kernel.cu.1
 

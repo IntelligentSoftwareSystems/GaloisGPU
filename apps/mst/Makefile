@@ -67,7 +67,7 @@ mst-dp: skel.o kernel.o support.o
 .phony: backup compare clean
 
 clean:
-	rm -f mst mst_nontex skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
+	rm -f mst mst_nontex skel.o kernel.o support.o skel-nontex.o kernel-nontex.o support-nontex.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
 
 backup: kernel.cu.1
 
