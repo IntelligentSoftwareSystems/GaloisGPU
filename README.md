@@ -53,7 +53,7 @@ make inputs # downloads the inputs required for LSG
 make # compiles all applications
 ```
 
-You can also recompile individual applciation ($APP) by entering $LSGDIR/apps/$APP directory.  However, this can be done only after first  *make* was performed in the$LSGDIR.
+You can also recompile individual applciation ($APP) by entering $LSGDIR/apps/$APP directory.  However, this can be done only after first  *make* was performed in the $LSGDIR.
 
 # Running
 
