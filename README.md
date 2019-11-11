@@ -30,13 +30,10 @@ git clone https://github.com/IntelligentSoftwareSystems/GaloisGPU
 
 [https://github.com/NVlabs/moderngpu/releases](https://github.com/NVlabs/moderngpu/releases)
 
-You will need to download CUB and Mgpu in the root source directory. Assuming
-LSGDIR contains the LonestarGPU source (i.e., this repository): 
+You will need to download CUB and Mgpu.
+Assuming LSGDIR contains the LonestarGPU source (i.e., this repository): 
 
 ```Shell
-cd $LSGDIR
-ln -s path-to-cub-x.y/ cub
-ln -s path-to-mgpu-x.y/ mgpu
 cd $LSGDIR/rt/include
 ln -s path-to-cub-x.y/ cub
 ln -s path-to-mgpu-x.y/ mgpu

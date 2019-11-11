@@ -1,6 +1,6 @@
 # expect to be in ROOT/app/
 include ../../arch.mk
-INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include
+INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include -I../../rt/include/cub
 LIBDIR=../../rt/lib
 LIBS=-lggrt -lcurand
 SKELAPP=../../skelapp
