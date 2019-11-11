@@ -21,12 +21,12 @@ git clone https://github.com/IntelligentSoftwareSystems/GaloisGPU
 
 ## Software pre-requisites
 
-* CUB (v1.3.1 or later)
+* CUB (v1.3.1)
 
 [https://github.com/NVlabs/cub](https://github.com/NVlabs/cub)
 
 
-* ModernGPU (v1.1 or later)
+* ModernGPU (v1.1)
 
 [https://github.com/NVlabs/moderngpu/releases](https://github.com/NVlabs/moderngpu/releases)
 
@@ -35,6 +35,9 @@ LSGDIR contains the LonestarGPU source (i.e., this repository):
 
 ```Shell
 cd $LSGDIR
+ln -s path-to-cub-x.y/ cub
+ln -s path-to-mgpu-x.y/ mgpu
+cd $LSGDIR/rt/include
 ln -s path-to-cub-x.y/ cub
 ln -s path-to-mgpu-x.y/ mgpu
 ```
@@ -49,6 +52,8 @@ cd $LSGDIR
 make inputs # downloads the inputs required for LSG
 make # compiles all applications
 ```
+
+You can also recompile individual applciation ($APP) by entering $LSGDIR/apps/$APP directory.  However, this can be done only after first  *make* was performed in the$LSGDIR.
 
 # Running
 
