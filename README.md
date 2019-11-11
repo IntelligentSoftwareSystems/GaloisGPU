@@ -8,7 +8,7 @@ irregular algorithms that exhibit amorphous data parallelism.
 You can checkout the latest release by typing (in a terminal):
 
 ```Shell
-git clone -b release-3.0 https://github.com/IntelligentSoftwareSystems/GaloisGPU
+git clone -b release-4.0 https://github.com/IntelligentSoftwareSystems/GaloisGPU
 ```
 
 The master branch will be regularly updated, so you may try out the latest
