@@ -40,7 +40,7 @@ unsigned CSRGraph::allocOnHost() {
   size_t mem_usage = ((nnodes + 1) + nedges) * sizeof(index_type) 
     + (nedges) * sizeof(edge_data_type) + (nnodes) * sizeof(node_data_type);
     
-  printf("Host memory for graph: %3u MB\n", mem_usage / 1048756);
+  printf("Host memory for graph: %lu MB\n", mem_usage / 1048756);
 
   return (edge_data && row_start && edge_dst && node_data);
 }

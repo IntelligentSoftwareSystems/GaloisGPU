@@ -361,8 +361,8 @@ struct Worklist {
       // counting density makes no sense -- it is always 1
     }
     
-    lindex = cub::ShuffleBroadcast(lindex, first);
-    //lindex = cub::ShuffleIndex(lindex, first); // CUB > 1.3.1
+    unsigned mask = __activemask();
+    lindex = __shfl_sync(mask, lindex, first);
 
     return lindex + offset;
   }
@@ -383,8 +383,8 @@ struct Worklist {
 #endif     
     }
     
-    lindex = cub::ShuffleBroadcast(lindex, first);
-    //lindex = cub::ShuffleIndex(lindex, first); // CUB > 1.3.1
+    unsigned mask = __activemask();
+    lindex = __shfl_sync(mask, lindex, first);
 
     return lindex + offset;
   }
@@ -405,8 +405,8 @@ struct Worklist {
 #endif     
     }
     
-    lindex = cub::ShuffleBroadcast(lindex, 0);
-    // lindex = cub::ShuffleIndex(lindex, 0); // CUB > 1.3.1
+    unsigned mask = __activemask();
+    lindex = __shfl_sync(mask, lindex, 0);
 
     return lindex + offset;
   }
@@ -740,8 +740,8 @@ struct Worklist2Light {
       // counting density makes no sense -- it is always 1
     }
     
-    lindex = cub::ShuffleBroadcast(lindex, first);
-    //lindex = cub::ShuffleIndex(lindex, first); // CUB > 1.3.1
+    unsigned mask = __activemask();
+    lindex = __shfl_sync(mask, lindex, first);
 
     return lindex + offset;
   }

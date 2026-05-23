@@ -37,8 +37,7 @@ apps/pr/pr
 apps/sgd/sgd
 apps/triangle/triangle
 apps/triangle/triangle_nontex
-cub
 inputs/
-mgpu
 rt/src/*.o
 rt/lib/libggrt.a
+cscope.out

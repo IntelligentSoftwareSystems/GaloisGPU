@@ -1,5 +1,5 @@
 include ../../arch.mk
-INCLUDES=-I../include -I../include/mgpu/include -I../include/cub
+INCLUDES=-I../include -I../include/mgpu/include
 LIBDIR=../lib
 SNAPPY_INC=~/.local/include
 SNAPPY_LIB=~/.local/lib

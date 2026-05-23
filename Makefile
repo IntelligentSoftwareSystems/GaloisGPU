@@ -1,8 +1,8 @@
 TOPLEVEL := .
 IRAPPS := bfs mst sssp sgd dmr mis cc pr triangle
 APPS := bh pta
-INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu2-inputs.tar.bz2
-BIP_INPUT_URL := http://iss.ices.utexas.edu/projects/galois/downloads/lonestargpu21-bipartite-inputs.tar.xz
+INPUT_URL := https://iss.oden.utexas.edu/projects/galois/downloads/lonestargpu2-inputs.tar.bz2
+BIP_INPUT_URL := https://iss.oden.utexas.edu/projects/galois/downloads/lonestargpu21-bipartite-inputs.tar.xz
 INPUT := lonestargpu2-inputs.tar.bz2
 BIP_INPUT := lonestargpu21-bipartite-inputs.tar.xz
 
@@ -29,7 +29,7 @@ inputs:
 	@echo "Uncompressing inputs ..."
 	@tar xvf $(INPUT)
 	@tar xvf $(BIP_INPUT)
-	@rm $(INPUT) $(BIP_INPUT)
+	@echo "Do you want to: rm $(INPUT) $(BIP_INPUT)"
 	@echo "Inputs available at $(TOPLEVEL)/inputs/"
 
 clean:

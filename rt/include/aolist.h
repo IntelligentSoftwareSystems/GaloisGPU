@@ -131,8 +131,9 @@ struct AppendOnlyList {
       assert(lindex <= size);
     }
     
-    lindex = cub::ShuffleBroadcast(lindex, first);
-    //lindex = cub::ShuffleIndex(lindex, first); // CUB > 1.3.1
+    unsigned mask = __activemask();
+    lindex = __shfl_sync(mask, lindex, first);
+
     return lindex + offset;
   }
 

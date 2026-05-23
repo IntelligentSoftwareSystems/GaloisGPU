@@ -1,0 +1,4 @@
+[submodule "rt/include/mgpu"]
+	path = rt/include/mgpu
+	url = https://github.com/moderngpu/moderngpu
+	branch = branch_1.1

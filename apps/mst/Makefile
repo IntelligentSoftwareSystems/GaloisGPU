@@ -1,12 +1,14 @@
 # expect to be in ROOT/app/
 include ../../arch.mk
-INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include  -I../../rt/include/cub
+INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include
 LIBDIR=../../rt/lib
 LIBS=-lggrt -lcurand
 SKELAPP=../../skelapp
-EXTRAFLAGS=-g -O3 -DCSRG_TEX -w
+EXTRAFLAGS=-g -O3 -DCSRG_TEX
 COMPRESS_LIBS=-lz
 SNAPPY_LIBDIR=~/.local/lib
+
+NVCCFLAGS += -arch=native
 
 ifeq ($(USE_SNAPPY),1)
   COMPRESS_LIBS+=-lsnappy -L $(SNAPPY_LIBDIR)
@@ -36,7 +38,7 @@ skel.o: $(SKELAPP)/skel.cu
 	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) $(EXTRAFLAGS) $(NVCCFLAGS) $(INCLUDES) $< -o $@
 
 skel-nontex.o: $(SKELAPP)/skel.cu
-	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) -g -O3 -w $(NVCCFLAGS) $(INCLUDES) $< -o $@
+	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) -g -O3 $(NVCCFLAGS) $(INCLUDES) $< -o $@
 
 %.o: %.cu
 #	nvcc -lineinfo -dc $(CUDA_ARCH) $(CXXFLAGS) $(EXTRAFLAGS) $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
@@ -44,10 +46,10 @@ skel-nontex.o: $(SKELAPP)/skel.cu
 
 # this is only needed if the AST contained 'CSRGraphTy' instead of Graph().param() or such.
 kernel-nontex.o: kernel-nontex.cu
-	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) -g -O3 -w $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
+	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) -g -O3 $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
 
 support-nontex.o: support.cu
-	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) -g -O3 -w $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
+	nvcc -dc $(CUDA_ARCH) $(CXXFLAGS) -g -O3 $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
 
 %.cubin: %.cu
 	nvcc -cubin -dc $(CUDA_ARCH) $(CXXFLAGS) $(EXTRAFLAGS) $(NVCCFLAGS) $(INCLUDES) $< $(EXTRA_SRC) -o $@ 
@@ -58,7 +60,7 @@ mst: skel.o kernel.o support.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
 	cp $@ ../../bin
 
 mst_nontex: skel-nontex.o kernel-nontex.o support-nontex.o $(SKELAPP)/mgpucontext.o $(SKELAPP)/mgpuutil.o
-	nvcc -g -O3 -w $(CUDA_ARCH) $(CXXFLAGS) $(NVCCFLAGS) $(INCLUDES) -L$(LIBDIR) $(LIBS) -o $@ $^ -lcudadevrt $(COMPRESS_LIBS)
+	nvcc -g -O3 $(CUDA_ARCH) $(CXXFLAGS) $(NVCCFLAGS) $(INCLUDES) -L$(LIBDIR) $(LIBS) -o $@ $^ -lcudadevrt $(COMPRESS_LIBS)
 	cp $@ ../../bin
 
 mst-dp: skel.o kernel.o support.o

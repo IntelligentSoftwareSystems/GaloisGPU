@@ -327,25 +327,25 @@ void gg_main_pipe_1(CSRGraph& gg, gint_p glevel, int& curdelta, int& i, int DELT
       {
         t_work.reset_thread_work();
         Inspect_sssp_kernel_dev <<<blocks, __tb_sssp_kernel>>>(gg, curdelta, t_work.thread_work_wl, t_work.thread_src_wl, enable_lb, pipe.in_wl(), pipe.out_wl());
-        cudaDeviceSynchronize();
+        assert(cudaDeviceSynchronize() == cudaSuccess);
         int num_items = t_work.thread_work_wl.in_wl().nitems();
         if (num_items != 0)
         {
           t_work.compute_prefix_sum();
-          cudaDeviceSynchronize();
+          assert(cudaDeviceSynchronize() == cudaSuccess);
           sssp_kernel_dev_TB_LB <<<blocks, __tb_sssp_kernel>>>(gg, curdelta, t_work.thread_prefix_work_wl.gpu_wr_ptr(), num_items, t_work.thread_src_wl, pipe.in_wl(), pipe.out_wl(), pipe.re_wl());
-          cudaDeviceSynchronize();
+          assert(cudaDeviceSynchronize() == cudaSuccess);
         }
       }
       sssp_kernel <<<blocks, __tb_sssp_kernel>>>(gg, curdelta, enable_lb, pipe.in_wl(), pipe.out_wl(), pipe.re_wl());
-      cudaDeviceSynchronize();
+      assert(cudaDeviceSynchronize() == cudaSuccess);
       pipe.in_wl().swap_slots();
       pipe.retry2();
     }
     pipe.advance2();
     pipe.out_wl().will_write();
     remove_dups <<<remove_dups_blocks, __tb_remove_dups>>>(glevel, pipe.in_wl(), pipe.out_wl(), remove_dups_barrier);
-    cudaDeviceSynchronize();
+    assert(cudaDeviceSynchronize() == cudaSuccess);
     pipe.in_wl().swap_slots();
     pipe.advance2();
     i++;
@@ -389,40 +389,7 @@ __global__ void __launch_bounds__(__tb_gg_main_pipe_1_gpu_gb) gg_main_pipe_1_gpu
     *cl_i = i;
   }
 }
-__global__ void gg_main_pipe_1_gpu(CSRGraph gg, gint_p glevel, int curdelta, int i, int DELTA, GlobalBarrier remove_dups_barrier, int remove_dups_blocks, PipeContextT<Worklist2> pipe, dim3 blocks, dim3 threads, int* cl_curdelta, int* cl_i, bool enable_lb)
-{
-  unsigned tid = TID_1D;
-  unsigned nthreads = TOTAL_THREADS_1D;
 
-  const unsigned __kernel_tb_size = __tb_one;
-  curdelta = *cl_curdelta;
-  i = *cl_i;
-  while (pipe.in_wl().nitems())
-  {
-    while (pipe.in_wl().nitems())
-    {
-      sssp_kernel <<<blocks, __tb_sssp_kernel>>>(gg, curdelta, enable_lb, pipe.in_wl(), pipe.out_wl(), pipe.re_wl());
-      cudaDeviceSynchronize();
-      pipe.in_wl().swap_slots();
-      cudaDeviceSynchronize();
-      pipe.retry2();
-    }
-    cudaDeviceSynchronize();
-    pipe.advance2();
-    remove_dups <<<remove_dups_blocks, __tb_remove_dups>>>(glevel, pipe.in_wl(), pipe.out_wl(), remove_dups_barrier);
-    cudaDeviceSynchronize();
-    pipe.in_wl().swap_slots();
-    cudaDeviceSynchronize();
-    pipe.advance2();
-    i++;
-    curdelta += DELTA;
-  }
-  if (tid == 0)
-  {
-    *cl_curdelta = curdelta;
-    *cl_i = i;
-  }
-}
 void gg_main_pipe_1_wrapper(CSRGraph& gg, gint_p glevel, int& curdelta, int& i, int DELTA, GlobalBarrier& remove_dups_barrier, int remove_dups_blocks, PipeContextT<Worklist2>& pipe, dim3& blocks, dim3& threads)
 {
   static GlobalBarrierLifetime gg_main_pipe_1_gpu_gb_barrier;
@@ -467,7 +434,7 @@ void gg_main(CSRGraph& hg, CSRGraph& gg)
   static const size_t remove_dups_blocks = GG_MIN(blocks.x, ggc_get_nSM() * remove_dups_residency);
   if(!remove_dups_barrier_inited) { remove_dups_barrier.Setup(remove_dups_blocks); remove_dups_barrier_inited = true;};
   kernel <<<blocks, threads>>>(gg, start_node);
-  cudaDeviceSynchronize();
+  assert(cudaDeviceSynchronize() == cudaSuccess);
   int i = 0;
   int curdelta = 0;
   printf("delta: %d\n", DELTA);

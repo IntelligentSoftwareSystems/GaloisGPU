@@ -1,10 +1,10 @@
 # expect to be in ROOT/app/
 include ../../arch.mk
-INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include  -I../../rt/include/cub
+INCLUDES=-I../../rt/include -I../../rt/include/mgpu/include
 LIBDIR=../../rt/lib
 LIBS=-lggrt -lcurand
 SKELAPP=../../skelapp
-EXTRAFLAGS=-g -O3 -w
+EXTRAFLAGS=-g -O3
 COMPRESS_LIBS=-lz
 SNAPPY_LIBDIR=~/.local/lib
 
